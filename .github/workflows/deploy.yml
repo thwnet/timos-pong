@@ -1,10 +1,3 @@
-name: Deploy to Hoststar (FTP)
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,28 +6,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ----------------------------------------------------------
-      # Debug: Show raw FTP banner from the server
-      # ----------------------------------------------------------
       - name: Debug raw FTP banner
         run: |
           echo "Testing raw FTP connection..."
           echo "QUIT" | nc -v ${{ secrets.FTP_SERVER }} ${{ secrets.FTP_PORT }} || true
           echo "---- End of FTP banner test ----"
 
-      # ----------------------------------------------------------
-      # Deploy via FTP
-      # ----------------------------------------------------------
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server:     ${{ secrets.FTP_SERVER }}       # z.B. lx18.hoststar.hosting
+          server:     ${{ secrets.FTP_SERVER }}
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
-          port:       ${{ secrets.FTP_PORT }}          # 21
-          protocol:   "ftp"                            # wichtig: KEIN ftps, KEIN sftp
-          local-dir:  "./"                             # oder ./dist/, falls du buildest
-          server-dir: ${{ secrets.FTP_DIR }}           # z.B. /txwo.monofy.band/public_html/pong3/
+          port:       ${{ secrets.FTP_PORT }}
+          protocol:   "ftp"
+          local-dir:  "./"
+          server-dir: ${{ secrets.FTP_DIR }}
           dangerous-clean-slate: false
           exclude: |
             **/.git*
