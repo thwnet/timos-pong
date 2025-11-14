@@ -36,6 +36,13 @@ const FAIL_GIF_URLS = [
   "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzU0N2d5ZmxzNHdmbWdqZ2g2aGxweW5zNGZnbGloMTZ6MmU3aDFmbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vOM8yfLQvZPe8/giphy.gif",
   "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnptNGc4Z3hkaW41dGNmZWNxNzh1ZWtianNpaDZsN2hnenhtNnE4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/73E4wQO3OUZPO/giphy.gif",
   "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp2cDQ2ZmcyejExcmI5OWxwejZmMWJ0eXJxMzd2bGE1ZHF2NnczaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7ANdVTT5lH9Kw/giphy.gif",
+  "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnlwYXk5bDE1ZTRveGd2ejcxcnE2ZGtjcmxhMHhheTNsZjY3OWk4aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/12iym4JFzHIDny/giphy.gif",
+  "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTZvODNtcGZwbmRuNDRzeDJjMDJ1c2dic3FtZHYwY3E4b2V1ZjF6bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/klevP4l8U8CJ2/giphy.gif",
+  "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnRnd2d4ZzJscmM4bWd0ZG82aXYwcGg4bHduM2Y4enB0M3NoMDBieCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/116WjShb7DL3vq/giphy.gif",
+  "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExejU3Zzk3bXhqYjE1eTk2NTZzdGo2Z2hzcGdkNXc2N3JnbmtleGV1dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1RFlG3sek3snm/giphy.gif",
+  "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGt1cmh0N3RmZnZ0dzY1MHJ0bjFwb3Y2bDhjeHhuMGh2dWdmMzd2MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JFvXIcjVDSCBi/giphy.gif",
+  "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW94cW41eDg0cjZ6cG5wa2pkOWtramFxMm5kb2ZwODRuMnIybTNhaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Fb9WDz7zjT6heBaEVR/giphy.gif",
+  "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2s3Y3cycXc1OXdpYXp6b2pudTVrZDhhbnJmN3BxZzdvbjU5cTR5diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MlFUNpARL4a1wtILEb/giphy.gif",
 ];
 const SUCCESS_GIF_LEVEL4 =
   "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHc1MXIzYzVncXoxbTI3ZHlrejdhZGh5MXB0M285cWkyYnliNHRjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SJtptYpvo8PU1XQ7DX/giphy.gif";
@@ -226,7 +233,6 @@ function showSuccessOverlay(
 ) {
   if (successOverlayImg) {
     successOverlayImg.src = gifUrl;
-    setSuccessOverlayImageSize();
   }
   if (successOverlayText) {
     successOverlayText.textContent = message;
@@ -234,14 +240,6 @@ function showSuccessOverlay(
   if (successOverlay) {
     successOverlay.classList.add("visible");
   }
-}
-
-function setSuccessOverlayImageSize() {
-  if (!successOverlayImg || !canvas) return;
-  const referenceWidth = canvas.clientWidth || canvas.width || 640;
-  const targetWidth = referenceWidth * 0.5; // quarter area => half width/height
-  successOverlayImg.style.width = `${targetWidth}px`;
-  successOverlayImg.style.height = "auto";
 }
 
 function hideSuccessOverlay() {
