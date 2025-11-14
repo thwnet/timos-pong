@@ -5,6 +5,10 @@
    Es sagt dem Browser: "Wie soll alles aussehen?"
    ============================================ */
 
+:root {
+  --playground-bg: #eee;
+}
+
 /* HTML und Body sollen die ganze Höhe einnehmen */
 html, body { 
   height: 100%;  /* 100% der Bildschirmhöhe */
@@ -249,7 +253,7 @@ main {
 
 /* Canvas: Grauer Hintergrund */
 canvas { 
-  background: #eee;  /* Hintergrund: hellgrau */
+  background: var(--playground-bg);  /* Hintergrund: hellgrau */
   touch-action: none; /* Verhindert Standard-Touch-Verhalten (z.B. Scrollen) */
   -webkit-touch-callout: none; /* Verhindert Kontextmenü auf iOS */
   -webkit-user-select: none; /* Verhindert Textauswahl */
@@ -333,6 +337,29 @@ canvas {
   display: flex;
   gap: 8px;
   justify-content: center;
+}
+
+.color-picker {
+  margin: 12px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: system-ui, sans-serif;
+}
+
+.color-picker label {
+  font-size: 14px;
+  color: #333;
+}
+
+.color-picker input[type="color"] {
+  width: 48px;
+  height: 48px;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
 }
 
 /* Mobile Controls: unter dem Playground */
@@ -686,6 +713,15 @@ canvas {
   .hud p {
     font-size: 12px;
     margin: 4px 0;
+  }
+  
+  .color-picker {
+    margin: 8px auto 4px;
+  }
+  
+  .color-picker input[type="color"] {
+    width: 40px;
+    height: 40px;
   }
   
   .control-btn {
