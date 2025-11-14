@@ -14,7 +14,8 @@ const PADDLE_HEIGHT = 80;
 const PADDLE_SPEED = 5;
 const BALL_SIZE = 10;
 const BALL_SPEED = 4; // Basisgeschwindigkeit der Bälle
-const DEFAULT_BG_COLOR = "#eeeeee";
+const DEFAULT_BG_COLOR = "#001a4d";
+const DEFAULT_OBJECT_COLOR = "#7fff66";
 const BALL_COLOR_LIGHT = "#ffffff";
 const BALL_COLOR_DARK = "#000000";
 const PADDLE_COLOR_LIGHT = "#ffffff";
@@ -33,9 +34,9 @@ let gameState = {
   hits: 0,
   level: 1, // Start-Level
   backgroundColor: DEFAULT_BG_COLOR,
-  ballColor: BALL_COLOR_DARK,
-  paddleColor: PADDLE_COLOR_DARK,
-  customObjectColor: null,
+  ballColor: DEFAULT_OBJECT_COLOR,
+  paddleColor: DEFAULT_OBJECT_COLOR,
+  customObjectColor: DEFAULT_OBJECT_COLOR,
 
   paddle: {
     x: 10,
@@ -67,10 +68,13 @@ function saveBackgroundColor(color) {
 
 function loadObjectColor() {
   const stored = localStorage.getItem(OBJECT_COLOR_STORAGE_KEY);
-  if (stored && isValidHexColor(stored)) {
+  if (!stored) {
+    return DEFAULT_OBJECT_COLOR;
+  }
+  if (isValidHexColor(stored)) {
     return stored;
   }
-  return null;
+  return DEFAULT_OBJECT_COLOR;
 }
 
 function saveObjectColor(color) {
