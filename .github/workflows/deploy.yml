@@ -1,4 +1,5 @@
-name: Deploy to Hoststar (SSH/rsync)
+
+name: Deploy to Hoststar
 
 on:
   push:
@@ -19,41 +20,23 @@ jobs:
       #
       # - name: Build
       #   run: npm run build
-      #
-      # Und dann unten bei rsync statt "./" z.B. "dist/" verwenden.
 
-      - name: Prepare SSH key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          # Einfacher SSH-Config-Eintrag für den Host
-          cat <<EOF >> ~/.ssh/config
-          Host deploy-host
-            HostName ${{ secrets.SSH_HOST }}
-            User ${{ secrets.SSH_USER }}
-            Port ${{ secrets.SSH_PORT }}
-            IdentityFile ~/.ssh/id_ed25519
-            StrictHostKeyChecking no
-          EOF
-
-      - name: Debug SSH connection
-        run: |
-          echo "Testing SSH connection..."
-          ssh deploy-host "echo 'SSH OK on $(hostname)'"
-          echo "---- End of SSH test ----"
-
-      - name: Deploy via rsync over SSH
-        run: |
-          # Quelle: aktuelles Repo (./)
-          # Ziel: dein Webroot auf dem Server
-          # Wenn du ein Build-Dir hast, nimm statt "./" z.B. "dist/"
-          rsync -avz --delete \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude 'node_modules/' \
-            ./ \
-            deploy-host:${{ secrets.SSH_REMOTE_DIR }}
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server:     ${{ secrets.FTP_SERVER }}
+          username:   ${{ secrets.FTP_USERNAME }}
+          password:   ${{ secrets.FTP_PASSWORD }}
+          port:       ${{ secrets.FTP_PORT }}
+          protocol:   "ftp"   # entspricht deinem Client (kein TLS)
+          local-dir:  "./"    # oder z.B. "./dist/" falls du baust
+          server-dir: ${{ secrets.FTP_DIR }}   # z.B. /txwo.monofy.band/public_html/pong3/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.github/**
+          timeout: 300000
+          dry-run: false
+          log-level: "verbose"
