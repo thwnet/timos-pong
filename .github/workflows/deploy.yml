@@ -1,4 +1,4 @@
-name: Deploy to New FTP
+name: Deploy to FTP (files.brueggli-medien.ch)
 
 on:
   push:
@@ -13,23 +13,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug DNS for FTP server
+      # ----------------------------------------------------------
+      # Debug: DNS & FTP banner testen
+      # ----------------------------------------------------------
+      - name: Debug DNS & FTP banner
         run: |
-          echo "Testing DNS for ${{ secrets.FTP_SERVER }}..."
-          nslookup ${{ secrets.FTP_SERVER }} || true
-          ping -c 3 ${{ secrets.FTP_SERVER }} || true
-          echo "---- End of DNS test ----"
+          echo "DNS Test:"
+          nslookup files.brueggli-medien.ch || true
+          echo "Ping Test:"
+          ping -c 3 files.brueggli-medien.ch || true
+          echo "FTP Banner Test:"
+          echo "QUIT" | nc -v files.brueggli-medien.ch 21 || true
+          echo "---- End of FTP debug ----"
 
+      # ----------------------------------------------------------
+      # Deploy via FTP
+      # ----------------------------------------------------------
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server:     ${{ secrets.FTP_SERVER }}
-          username:   ${{ secrets.FTP_USERNAME }}
-          password:   ${{ secrets.FTP_PASSWORD }}
-          port:       ${{ secrets.FTP_PORT }}
-          protocol:   "ftp"
-          local-dir:  "./"
-          server-dir: ${{ secrets.FTP_DIR }}
+          server:     "files.brueggli-medien.ch"
+          username:   "twa03"
+          password:   ${{ secrets.FTP_PASSWORD }}   # <<< Passwort hier eintragen!
+          port:       21
+          protocol:   "ftp"                      # wichtig: ftp, nicht ftps/sftp
+          local-dir:  "./"                       # oder ./dist/, falls du baust
+          server-dir: "/test/"                   # mit führendem & abschließendem Slash
           dangerous-clean-slate: false
           exclude: |
             **/.git*
