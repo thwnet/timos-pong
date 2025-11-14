@@ -13,18 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ----------------------------------------------------------
-      # Debug: DNS & FTP banner testen
-      # ----------------------------------------------------------
-      - name: Debug DNS & FTP banner
-        run: |
-          echo "DNS Test:"
-          nslookup files.brueggli-medien.ch || true
-          echo "Ping Test:"
-          ping -c 3 files.brueggli-medien.ch || true
-          echo "FTP Banner Test:"
-          echo "QUIT" | nc -v files.brueggli-medien.ch 21 || true
-          echo "---- End of FTP debug ----"
+
 
       # ----------------------------------------------------------
       # Deploy via FTP
