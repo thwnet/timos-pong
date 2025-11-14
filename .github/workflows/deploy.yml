@@ -13,21 +13,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server:     "pongftp.waespis.net"
-          username:   ${{ secrets.FTP_USERNAME }}
-          password:   ${{ secrets.FTP_PASSWORD }}
-          port:       21
-          protocol:   "ftps"                  # explicit TLS per Metanet guide
-          local-dir:  "./"
-          server-dir: "./"
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.github/**
-          timeout: 120000
-          dry-run: false
-          log-level: "verbose"
+      - name: Install lftp client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Deploy via lftp (FTPeS)
+        env:
+          FTP_SERVER: "pongftp.waespis.net"
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${FTP_USERNAME}" || -z "${FTP_PASSWORD}" ]]; then
+            echo "FTP credentials are missing. Please configure FTP_USERNAME and FTP_PASSWORD secrets."
+            exit 1
+          fi
+
+          REMOTE_DIR="${FTP_SERVER_DIR:-/}"
+          REMOTE_DIR="${REMOTE_DIR%/}/"
+
+          echo "Uploading to ${FTP_SERVER}:${REMOTE_DIR}"
+
+          lftp -u "${FTP_USERNAME}","${FTP_PASSWORD}" "${FTP_SERVER}" <<EOF
+          set ssl:verify-certificate no
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ftp:passive-mode true
+          set ftp:prefer-epsv false
+          set net:max-retries 3
+          set net:persist-retries 2
+          set net:timeout 45
+          set net:reconnect-interval-base 5
+          set net:reconnect-interval-max 30
+          mirror --reverse --continue --parallel=2 \
+            --exclude-glob .git --exclude-glob .git* \
+            --exclude-glob .github --exclude-glob .github/** \
+            --exclude-glob node_modules --exclude-glob node_modules/** \
+            ./ "${REMOTE_DIR}"
+          bye
+EOF
