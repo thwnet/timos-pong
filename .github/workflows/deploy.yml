@@ -3,7 +3,7 @@ name: Deploy to Hoststar
 on:
   push:
     branches:
-      - main    # bei Bedarf anpassen
+      - main
 
 jobs:
   deploy:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Falls du zuerst bauen musst (z.B. npm build), füge hier deine Build-Schritte ein
+      # Falls du einen Build hast, hier wieder aktivieren:
       # - name: Install dependencies
       #   run: npm ci
       #
@@ -27,9 +27,9 @@ jobs:
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
           port:       ${{ secrets.FTP_PORT }}
-          protocol:   "ftp"          # für FTPS/SFTP siehe Doku
-          local-dir:  "./"           # oder z.B. "./dist" wenn du baust
-          server-dir: ${{ secrets.FTP_DIR }}  # z.B. /public_html/
+          protocol:   "ftp"   # entspricht deinem Client (kein TLS)
+          local-dir:  "./"    # oder z.B. "./dist/" falls du baust
+          server-dir: ${{ secrets.FTP_DIR }}   # z.B. /txwo.monofy.band/public_html/pong3/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
@@ -38,3 +38,4 @@ jobs:
             **/.github/**
           timeout: 300000
           dry-run: false
+          log-level: "verbose"
