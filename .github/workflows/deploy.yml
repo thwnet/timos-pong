@@ -1,15 +1,9 @@
-name: Deploy to Hoststar
+name: Deploy to Hoststar (FTP)
 
 on:
   push:
     branches:
       - main
-
-      - name: Debug raw FTP banner
-      run: |
-        echo "QUIT" | nc -v ${{ secrets.FTP_SERVER }} ${{ secrets.FTP_PORT }} || true
-    
-
 
 jobs:
   deploy:
@@ -19,23 +13,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Falls du einen Build hast, hier wieder aktivieren:
-      # - name: Install dependencies
-      #   run: npm ci
-      #
-      # - name: Build
-      #   run: npm run build
+      # ----------------------------------------------------------
+      # Debug: Show raw FTP banner from the server
+      # ----------------------------------------------------------
+      - name: Debug raw FTP banner
+        run: |
+          echo "Testing raw FTP connection..."
+          echo "QUIT" | nc -v ${{ secrets.FTP_SERVER }} ${{ secrets.FTP_PORT }} || true
+          echo "---- End of FTP banner test ----"
 
+      # ----------------------------------------------------------
+      # Deploy via FTP
+      # ----------------------------------------------------------
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          server:     ${{ secrets.FTP_SERVER }}
+          server:     ${{ secrets.FTP_SERVER }}       # z.B. lx18.hoststar.hosting
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
-          port:       ${{ secrets.FTP_PORT }}
-          protocol:   "ftp"   # entspricht deinem Client (kein TLS)
-          local-dir:  "./"    # oder z.B. "./dist/" falls du baust oder
-          server-dir: ${{ secrets.FTP_DIR }}   # z.B. /txwo.monofy.band/public_html/pong3/
+          port:       ${{ secrets.FTP_PORT }}          # 21
+          protocol:   "ftp"                            # wichtig: KEIN ftps, KEIN sftp
+          local-dir:  "./"                             # oder ./dist/, falls du buildest
+          server-dir: ${{ secrets.FTP_DIR }}           # z.B. /txwo.monofy.band/public_html/pong3/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
@@ -44,4 +43,4 @@ jobs:
             **/.github/**
           timeout: 300000
           dry-run: false
-          log-level: "verbose"
+          log-level: verbose
