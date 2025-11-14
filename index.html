@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!-- ============================================
+     PONG SPIEL - HTML DATEI
+     ============================================
+     Diese Datei beschreibt den Aufbau der Seite.
+     Das eigentliche Spiel läuft in game.js auf
+     dem Canvas-Element.
+     ============================================ -->
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Pong Game mit Levels</title>
+
+    <!-- Seite auch auf kleineren Bildschirmen korrekt anzeigen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Portrait orientation für Mobile -->
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Externe CSS-Datei für das Aussehen der Seite -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <!-- ============================================
+         SPIELFELD (CANVAS)
+         ============================================
+         Auf diesem Canvas wird das Spiel gezeichnet.
+         Die Breite/Höhe kannst du später anpassen.
+         ============================================ -->
+      <div class="game-wrapper">
+        <!-- ============================================
+           BESTENLISTE / RESULTS TABLE
+           ============================================
+           Zeigt die 3 besten Scores an.
+           Auf Mobile: innerhalb des Playgrounds
+           ============================================ -->
+        <div class="results-container">
+          <h2>Bestenliste</h2>
+          <table id="resultsTable" class="results-table">
+            <thead>
+              <tr>
+                <th>Platz</th>
+                <th>Treffer</th>
+                <th>Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1.</td>
+                <td id="score1">-</td>
+                <td id="level1">-</td>
+              </tr>
+              <tr>
+                <td>2.</td>
+                <td id="score2">-</td>
+                <td id="level2">-</td>
+              </tr>
+              <tr>
+                <td>3.</td>
+                <td id="score3">-</td>
+                <td id="level3">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="game-container">
+          <canvas id="game" width="640" height="400"></canvas>
+          <div class="arrow-buttons-container touch-only">
+            <button id="arrowUp" class="arrow-btn arrow-btn-left" aria-label="Schläger nach oben">
+              <span class="arrow-up">▲</span>
+            </button>
+            <button id="arrowDown" class="arrow-btn arrow-btn-right" aria-label="Schläger nach unten">
+              <span class="arrow-down">▼</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Control buttons: auf Mobile unter dem Playground -->
+        <div class="controls controls-mobile">
+          <button id="pauseBtn" class="control-btn">Start/Pause</button>
+          <button id="resetBtn" class="control-btn">Reset</button>
+        </div>
+      </div>
+
+      <!-- ============================================
+         INFOBEREICH / HUD (Heads-Up Display)
+         ============================================
+         Hier zeigen wir Treffer, Level und Steuerung.
+         ============================================ -->
+      <div class="hud">
+        <p>
+          <strong>Treffer:</strong>
+          <span id="scoreL">0</span><br />
+          <strong>Level:</strong>
+          <span id="level">1</span>
+        </p>
+        <div class="controls controls-desktop">
+          <button id="pauseBtnDesktop" class="control-btn">Start/Pause</button>
+          <button id="resetBtnDesktop" class="control-btn">Reset</button>
+        </div>
+        <p>
+          <small>
+            <span class="desktop-only">
+              Steuerung:
+              <kbd>W</kbd>/<kbd>S</kbd> = Schläger bewegen<br />
+              <kbd>Leertaste</kbd> = Start/Pause<br />
+              <kbd>R</kbd> = Spiel zurücksetzen
+            </span>
+            <span class="touch-only">
+              Steuerung: Pfeil-Buttons ▲/▼ = Schläger bewegen<br />
+              Auf dem Spielfeld tippen/ziehen = Schläger bewegen<br />
+              Doppel-Tap = Reset
+            </span>
+          </small>
+        </p>
+      </div>
+    </main>
+
+    <!-- ============================================
+       JAVASCRIPT-DATEI EINBINDEN
+       ============================================
+       defer: Script wird geladen, aber erst ausgeführt,
+       wenn das HTML-Dokument fertig geparst ist.
+       ============================================ -->
+    <script src="game.js" defer></script>
+  </body>
+</html>

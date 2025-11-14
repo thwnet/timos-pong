@@ -1,0 +1,708 @@
+/* ============================================
+   PONG SPIEL - CSS CODE
+   ============================================
+   CSS macht unsere Seite schön!
+   Es sagt dem Browser: "Wie soll alles aussehen?"
+   ============================================ */
+
+/* HTML und Body sollen die ganze Höhe einnehmen */
+html, body { 
+  height: 100%;  /* 100% der Bildschirmhöhe */
+  margin: 0;     /* Keine Abstände am Rand */
+}
+
+/* Body: Alles in der Mitte zentrieren */
+body { 
+  display: grid;           /* Grid-Layout verwenden */
+  place-items: center;     /* Alles in die Mitte */
+  background: #fff;        /* Hintergrund: weiss */
+}
+
+/* Auf Mobile: Body sollte alle Inhalte zeigen */
+@media (max-width: 480px) {
+  html {
+    transform: none !important;
+    -webkit-transform: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+  
+  body {
+    overflow-y: auto !important;
+    min-height: 100vh;
+    padding-bottom: 200px; /* Platz für Controls */
+    transform: none !important;
+    -webkit-transform: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+}
+
+/* Main Container */
+main {
+  transition: transform 0.3s ease;
+}
+
+/* Sicherstellen: KEINE Rotation auf Mobile */
+@media (max-width: 480px) {
+  main {
+    transform: none !important;
+    -webkit-transform: none !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    top: auto !important;
+    left: auto !important;
+    transition: none !important;
+  }
+  
+  html, body {
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+}
+
+/* Game Wrapper: Container für Game + Mobile Controls */
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Game Container: Canvas + Touch Controls */
+.game-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Desktop/iPad: normale Anzeige mit Buttons links/rechts */
+@media (min-width: 481px) {
+  .game-container {
+    position: relative;
+    display: inline-block;
+  }
+}
+
+/* Arrow Buttons Container: für Desktop/iPad absolute positioning (links/rechts) */
+.arrow-buttons-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Container blockiert keine Klicks */
+  display: block;
+}
+
+/* Desktop/iPad: Buttons bleiben links/rechts (NICHT unten) */
+@media (min-width: 481px) {
+  .arrow-buttons-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    pointer-events: none !important;
+    display: block !important;
+    margin-top: 0 !important;
+    height: auto !important;
+  }
+  
+  .game-container {
+    display: inline-block !important;
+    flex-direction: row !important;
+    align-items: center;
+  }
+  
+  /* Desktop: Buttons links/rechts positionieren */
+  .arrow-btn {
+    position: absolute !important;
+    transform: translateY(-50%) !important;
+    top: 50% !important;
+  }
+  
+  .arrow-btn-left {
+    left: -130px !important;
+    right: auto !important;
+  }
+  
+  .arrow-btn-right {
+    right: -130px !important;
+    left: auto !important;
+  }
+}
+
+/* Auf Mobile: Arrow Buttons Container - links und rechts positioniert */
+@media (max-width: 480px) {
+  /* Landscape orientation bevorzugen */
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollbar erlauben falls nötig */
+  }
+  
+  main {
+    overflow: visible !important;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    display: block !important;
+    position: relative;
+  }
+  
+  /* Sicherstellen dass main alle Inhalte zeigt */
+  main > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Portrait-Mode: normale Anzeige (keine Rotation) */
+  @media screen and (orientation: portrait) {
+    main {
+      transform: none !important;
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      margin: 0 !important;
+      top: auto !important;
+      left: auto !important;
+    }
+    
+    html, body {
+      width: 100vw !important;
+      height: 100vh !important;
+      overflow: visible !important;
+      transform: none !important;
+    }
+  }
+  
+  /* Landscape-Mode: normale Anzeige */
+  @media screen and (orientation: landscape) {
+    main {
+      transform: none !important;
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      margin: 0 !important;
+      top: auto !important;
+      left: auto !important;
+    }
+    
+    html, body {
+      transform: none !important;
+    }
+  }
+  
+  /* Touch-only Elemente auf Mobile sichtbar machen */
+  .touch-only {
+    display: block !important;
+  }
+  
+  .arrow-buttons-container {
+    position: fixed !important;
+    bottom: 5% !important;
+    left: 0;
+    right: 0;
+    top: auto !important;
+    pointer-events: none;
+    display: flex !important;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    padding: 0 5%;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 200 !important;
+    background: transparent;
+  }
+  
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    padding: 0 5%;
+    margin: 0 auto;
+  }
+  
+  /* Canvas: 90% Breite, 60% Höhe */
+  canvas {
+    width: 90% !important;
+    max-width: 90% !important;
+    height: 60vh !important;
+    max-height: 60vh !important;
+    margin: 0 auto;
+    display: block;
+    object-fit: contain;
+  }
+  
+  /* Results container relativ zum game-container positionieren */
+  .game-wrapper {
+    position: relative;
+  }
+}
+
+/* Canvas: Grauer Hintergrund */
+canvas { 
+  background: #eee;  /* Hintergrund: hellgrau */
+  touch-action: none; /* Verhindert Standard-Touch-Verhalten (z.B. Scrollen) */
+  -webkit-touch-callout: none; /* Verhindert Kontextmenü auf iOS */
+  -webkit-user-select: none; /* Verhindert Textauswahl */
+  user-select: none;
+  display: block;
+}
+
+/* Bestenliste / Results Table */
+.results-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.results-container h2 {
+  font-family: system-ui, sans-serif;
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.results-table {
+  font-family: system-ui, sans-serif;
+  border-collapse: collapse;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.results-table thead {
+  background: #333;
+  color: #fff;
+}
+
+.results-table th {
+  padding: 10px 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.results-table tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+.results-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.results-table td {
+  padding: 10px 20px;
+  text-align: center;
+  color: #333;
+}
+
+.results-table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.results-table tbody tr:nth-child(odd) {
+  background: #fff;
+}
+
+/* Spiel-Info (HUD) Styling */
+.hud { 
+  font-family: system-ui, sans-serif;  /* Schriftart */
+  margin-top: 8px;                     /* Abstand nach oben */
+  text-align: center;                  /* Text zentrieren */
+}
+
+/* Tasten-Symbole (kbd) schön machen */
+.hud kbd { 
+  border: 1px solid #aaa;    /* Rahmen */
+  padding: 2px 4px;          /* Innenabstand */
+  border-radius: 4px;        /* Abgerundete Ecken */
+}
+
+/* Touch-freundliche Buttons */
+.controls {
+  margin: 12px 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Mobile Controls: unter dem Playground */
+.controls-mobile {
+  display: none; /* Standard: versteckt */
+}
+
+/* Desktop Controls: im HUD */
+.controls-desktop {
+  display: flex; /* Standard: sichtbar */
+}
+
+.control-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-family: system-ui, sans-serif;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation; /* Schnellere Touch-Reaktion */
+  min-height: 44px; /* Mindestgröße für Touch-Ziele */
+  min-width: 80px;
+  transition: background 0.2s;
+}
+
+.control-btn:hover {
+  background: #555;
+}
+
+.control-btn:active {
+  background: #222;
+}
+
+/* Responsive: Desktop vs. Touch */
+.desktop-only {
+  display: block;
+}
+
+.touch-only {
+  display: none;
+}
+
+/* Touch-Steuerung: Pfeil-Buttons */
+.arrow-btn {
+  position: absolute;
+  width: 80px; /* Größer: von 60px auf 80px */
+  height: 80px; /* Größer: von 60px auf 80px */
+  border-radius: 50%;
+  border: 3px solid #333;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 0; /* Versteckt Text, zeigt nur das span */
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+/* Up arrow: Links vom Canvas */
+.arrow-btn-left {
+  left: -130px; /* Links neben dem Canvas (mehr Abstand zum Canvas) */
+}
+
+/* Down arrow: Rechts vom Canvas */
+.arrow-btn-right {
+  right: -130px; /* Rechts neben dem Canvas (mehr Abstand zum Canvas) */
+}
+
+.arrow-btn:active {
+  background: #333;
+  transform: translateY(-50%) scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.arrow-btn span {
+  font-size: 36px; /* Größer: von 28px auf 36px */
+  color: #333;
+  line-height: 1;
+  display: block;
+}
+
+.arrow-btn:active span {
+  color: #fff;
+}
+
+/* Auf Touch-Geräten: Touch-Anweisungen zeigen, Desktop-Anweisungen verstecken */
+@media (hover: none) and (pointer: coarse) {
+  .desktop-only {
+    display: none;
+  }
+  
+  .touch-only {
+    display: block;
+  }
+}
+
+/* Auf kleineren Bildschirmen (Tablet): Pfeile unter dem Canvas */
+@media (max-width: 800px) and (min-width: 481px) {
+  .arrow-btn {
+    position: static;
+    transform: none;
+    margin-top: 12px;
+  }
+  
+  .arrow-btn-left {
+    left: auto;
+    margin-right: 32px; /* Abstand zwischen den Buttons */
+  }
+  
+  .arrow-btn-right {
+    right: auto;
+    margin-left: 32px; /* Abstand zwischen den Buttons */
+  }
+  
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .arrow-btn {
+    width: 200px; /* Größer: von 70px auf 90px */
+    height: 200px; /* Größer: von 70px auf 90px */
+  }
+  
+  .arrow-btn span {
+    font-size: 80px; /* Größer: von 32px auf 40px */
+  }
+}
+
+/* iPhone-spezifische Anpassungen */
+@media (max-width: 480px) {
+  /* Canvas skalieren für iPhone - wird auch von JavaScript angepasst */
+  canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .game-wrapper {
+    width: 100%;
+  }
+  
+  .game-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  
+  /* Mobile Controls: unter dem Playground, links und rechts positioniert */
+  .controls-mobile {
+    display: flex !important;
+    margin-top: 16px;
+    margin-bottom: 20px;
+    width: 90%;
+    max-width: 90%;
+    justify-content: space-between;
+    gap: 12px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
+    background: transparent;
+    padding: 0 5%;
+  }
+  
+  .controls-mobile .control-btn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 101 !important;
+    flex: 0 0 auto;
+  }
+  
+  /* Desktop Controls: im HUD verstecken */
+  .controls-desktop {
+    display: none !important;
+  }
+  
+  /* Arrow buttons: AM BODEN DES BILDSCHIRMS, links und rechts */
+  .arrow-btn {
+    position: relative !important;
+    transform: none !important;
+    margin: 0 !important;
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    min-height: 80px;
+    pointer-events: auto;
+    z-index: 201 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    background: #fff !important;
+    border: 3px solid #333 !important;
+  }
+  
+  /* Up arrow: LINKS am Bildschirmrand */
+  .arrow-btn-left {
+    left: auto !important;
+    right: auto !important;
+    order: 1;
+  }
+  
+  /* Down arrow: RECHTS am Bildschirmrand */
+  .arrow-btn-right {
+    left: auto !important;
+    right: auto !important;
+    order: 2;
+  }
+  
+  .arrow-btn span {
+    font-size: 36px;
+  }
+  
+  /* Canvas: 90% Breite mit 5% Margin (bereits oben definiert) */
+  
+  /* Game wrapper für bessere Kontrolle */
+  .game-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible !important; /* Buttons sollen sichtbar sein */
+    min-height: auto;
+    padding-bottom: 150px; /* Extra Platz für Controls */
+    position: relative;
+  }
+  
+  /* Sicherstellen dass alle Controls sichtbar sind */
+  .game-container,
+  .arrow-buttons-container,
+  .controls-mobile {
+    overflow: visible !important;
+    position: relative !important;
+  }
+  
+  /* Game container sollte genug Platz haben */
+  .game-container {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  /* Portrait und Landscape: normale Viewport-Dimensionen */
+  @media screen and (orientation: portrait),
+         screen and (orientation: landscape) {
+    .game-wrapper,
+    .game-container {
+      width: 100vw;
+      max-width: 100vw;
+    }
+    
+    canvas {
+      max-width: 90% !important;
+      width: 90% !important;
+      max-height: 60vh !important;
+      height: 60vh !important;
+    }
+  }
+  
+  /* Results table: INNERHALB des Playgrounds positionieren */
+  /* Position relativ zum game-container */
+  .game-wrapper {
+    position: relative;
+  }
+  
+  .results-container {
+    position: absolute !important;
+    top: 8px;
+    right: 8px;
+    margin: 0;
+    padding: 4px;
+    max-width: 110px;
+    z-index: 15;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none; /* Nicht klickbar, nur Anzeige */
+  }
+  
+  .results-container h2 {
+    font-size: 10px;
+    margin-bottom: 2px;
+    margin-top: 0;
+    text-align: center;
+  }
+  
+  .results-table {
+    font-size: 9px;
+    border-radius: 4px;
+    width: 100%;
+  }
+  
+  .results-table th {
+    padding: 2px 4px;
+    font-size: 8px;
+  }
+  
+  .results-table td {
+    padding: 2px 4px;
+    font-size: 8px;
+  }
+  
+  .results-table thead {
+    padding: 0;
+  }
+  
+  /* Results table auf Desktop/iPad: normale Position */
+  @media (min-width: 481px) {
+    .results-container {
+      position: static;
+      margin-bottom: 20px;
+      padding: 0 5px;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+      background: transparent;
+      box-shadow: none;
+    }
+    
+    .results-container h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    
+    .results-table {
+      font-size: 14px;
+    }
+    
+    .results-table th,
+    .results-table td {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+  }
+  
+  /* HUD kompakter */
+  .hud {
+    margin-top: 6px;
+    padding: 0 10px;
+  }
+  
+  .hud p {
+    font-size: 12px;
+    margin: 4px 0;
+  }
+  
+  .control-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 36px;
+    min-width: 60px;
+  }
+  
+  .hud small {
+    font-size: 9px;
+    display: none; /* Verstecke Anweisungen auf Mobile um Platz zu sparen */
+  }
+  
+  /* Mobile Controls sichtbar machen */
+  .controls-mobile {
+    margin-top: 8px;
+    margin-bottom: 4px;
+  }
+}
