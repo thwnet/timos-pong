@@ -17,6 +17,8 @@ const BALL_SPEED = 4; // Basisgeschwindigkeit der Bälle
 const DEFAULT_BG_COLOR = "#eeeeee";
 const BALL_COLOR_LIGHT = "#ffffff";
 const BALL_COLOR_DARK = "#000000";
+const PADDLE_COLOR_LIGHT = "#ffffff";
+const PADDLE_COLOR_DARK = "#333333";
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 
 const HITS_PER_LEVEL = 5; // Alle 5 Treffer -> nächstes Level
@@ -31,6 +33,7 @@ let gameState = {
   level: 1, // Start-Level
   backgroundColor: DEFAULT_BG_COLOR,
   ballColor: BALL_COLOR_DARK,
+  paddleColor: PADDLE_COLOR_DARK,
 
   paddle: {
     x: 10,
@@ -63,9 +66,9 @@ function saveBackgroundColor(color) {
 function applyBackgroundColor(color, { persist = true } = {}) {
   const finalColor = isValidHexColor(color) ? color : DEFAULT_BG_COLOR;
   gameState.backgroundColor = finalColor;
-  gameState.ballColor = shouldUseLightBallColor(finalColor)
-    ? BALL_COLOR_LIGHT
-    : BALL_COLOR_DARK;
+  const useLightColor = shouldUseLightBallColor(finalColor);
+  gameState.ballColor = useLightColor ? BALL_COLOR_LIGHT : BALL_COLOR_DARK;
+  gameState.paddleColor = useLightColor ? PADDLE_COLOR_LIGHT : PADDLE_COLOR_DARK;
   document.documentElement.style.setProperty("--playground-bg", finalColor);
   if (persist) {
     saveBackgroundColor(finalColor);
@@ -447,7 +450,7 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Schläger
-  ctx.fillStyle = "#333";
+  ctx.fillStyle = gameState.paddleColor || PADDLE_COLOR_DARK;
   ctx.fillRect(
     gameState.paddle.x,
     gameState.paddle.y,
