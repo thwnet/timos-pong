@@ -62,6 +62,19 @@ body {
   margin-top: 16px;
 }
 
+.slider-control {
+  margin: 12px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: system-ui, sans-serif;
+  align-items: center;
+}
+
+.slider-control input[type="range"] {
+  width: 160px;
+}
+
 /* Auf Mobile: Body sollte alle Inhalte zeigen */
 @media (max-width: 480px) {
   html {

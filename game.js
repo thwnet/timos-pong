@@ -18,7 +18,9 @@ const successOverlayText = successOverlay
 // ============================================
 const PADDLE_WIDTH = 10;
 const PADDLE_HEIGHT = 80;
-const PADDLE_SPEED = 5;
+const DEFAULT_PADDLE_SPEED = 5;
+const MIN_PADDLE_SPEED = 2;
+const MAX_PADDLE_SPEED = 15;
 const BALL_SIZE = 10;
 const BALL_SPEED = 4; // Basisgeschwindigkeit der Bälle
 const DEFAULT_BG_COLOR = "#001a4d";
@@ -40,6 +42,7 @@ const SUCCESS_GIF_LEVEL6 =
   "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTN6ZXJpNHZ4enZiYWdpaWxpN28yaHBoM29wdHZ4YzNlYnkxaWY5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/G3uXJGdnIEQ9sFcxTR/giphy.gif";
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 const OBJECT_COLOR_STORAGE_KEY = "pongObjectColor";
+const PADDLE_SPEED_STORAGE_KEY = "pongPaddleSpeed";
 
 const HITS_PER_LEVEL = 5; // Alle 5 Treffer -> nächstes Level
 const SPEED_INCREASE_PER_LEVEL = 0.5; // Neue Bälle werden pro Level schneller
@@ -47,6 +50,8 @@ const SPEED_INCREASE_PER_LEVEL = 0.5; // Neue Bälle werden pro Level schneller
 // ============================================
 // SPIELZUSTAND
 // ============================================
+let paddleSpeed = loadPaddleSpeed();
+
 let gameState = {
   paused: true,
   hits: 0,
@@ -70,6 +75,10 @@ let gameState = {
 // ============================================
 // HINTERGRUNDFARBE
 // ============================================
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
 function isValidHexColor(color) {
   return typeof color === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color);
 }
@@ -126,6 +135,27 @@ function setCustomObjectColor(color) {
   }
   updateObjectColors();
   draw();
+}
+
+function loadPaddleSpeed() {
+  const stored = localStorage.getItem(PADDLE_SPEED_STORAGE_KEY);
+  if (!stored) return DEFAULT_PADDLE_SPEED;
+  const value = parseInt(stored, 10);
+  if (Number.isNaN(value)) return DEFAULT_PADDLE_SPEED;
+  return clamp(value, MIN_PADDLE_SPEED, MAX_PADDLE_SPEED);
+}
+
+function savePaddleSpeed(value) {
+  localStorage.setItem(PADDLE_SPEED_STORAGE_KEY, String(value));
+}
+
+function setPaddleSpeed(value, { persist = true } = {}) {
+  const numericValue = clamp(Number(value) || DEFAULT_PADDLE_SPEED, MIN_PADDLE_SPEED, MAX_PADDLE_SPEED);
+  paddleSpeed = numericValue;
+  updatePaddleSpeedUI();
+  if (persist) {
+    savePaddleSpeed(numericValue);
+  }
 }
 
 function applyBackgroundColor(color, { persist = true } = {}) {
@@ -351,20 +381,20 @@ canvas.addEventListener("touchcancel", (e) => {
 function updatePaddle() {
   // Tastatur-Steuerung (W/S oder Pfeiltasten)
   if ((keys["w"] || keys["arrowup"]) && gameState.paddle.y > 0) {
-    gameState.paddle.y -= PADDLE_SPEED;
+    gameState.paddle.y -= paddleSpeed;
   }
 
   if ((keys["s"] || keys["arrowdown"]) && gameState.paddle.y < canvas.height - PADDLE_HEIGHT) {
-    gameState.paddle.y += PADDLE_SPEED;
+    gameState.paddle.y += paddleSpeed;
   }
 
   // Touch-Pfeil-Buttons
   if (arrowUpPressed && gameState.paddle.y > 0) {
-    gameState.paddle.y -= PADDLE_SPEED;
+    gameState.paddle.y -= paddleSpeed;
   }
 
   if (arrowDownPressed && gameState.paddle.y < canvas.height - PADDLE_HEIGHT) {
-    gameState.paddle.y += PADDLE_SPEED;
+    gameState.paddle.y += paddleSpeed;
   }
 }
 
@@ -728,10 +758,35 @@ function setupObjectColorPicker(picker) {
   });
 }
 
+function setupPaddleSpeedControl(slider, valueDisplay) {
+  updatePaddleSpeedUI();
+  if (slider) {
+    slider.value = paddleSpeed;
+    slider.addEventListener("input", (e) => {
+      setPaddleSpeed(e.target.value);
+    });
+  }
+  if (valueDisplay) {
+    valueDisplay.textContent = paddleSpeed;
+  }
+}
+
+function updatePaddleSpeedUI() {
+  if (paddleSpeedSlider) {
+    paddleSpeedSlider.value = paddleSpeed;
+  }
+  if (paddleSpeedValueEl) {
+    paddleSpeedValueEl.textContent = paddleSpeed;
+  }
+}
+
 const bgColorPicker = document.getElementById("bgColorPicker");
 setupBackgroundColorPicker(bgColorPicker);
 const objectColorPicker = document.getElementById("objectColorPicker");
 setupObjectColorPicker(objectColorPicker);
+const paddleSpeedSlider = document.getElementById("paddleSpeedRange");
+const paddleSpeedValueEl = document.getElementById("paddleSpeedValue");
+setupPaddleSpeedControl(paddleSpeedSlider, paddleSpeedValueEl);
 
 // ============================================
 // PFEIL-BUTTON-EVENTS (Touch-Steuerung)
