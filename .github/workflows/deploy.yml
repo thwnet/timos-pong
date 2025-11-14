@@ -27,7 +27,7 @@ jobs:
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
           port:       ${{ secrets.FTP_PORT }}   # 21
-          protocol:   "ftp"                     # WICHTIG: kein ftps
+          protocol:   "ftp"                     # WICHTIG: kein ftps sondern sftp
           local-dir:  "./"                      # oder ./dist/, falls du baust
           server-dir: ${{ secrets.FTP_DIR }}    # /txwo.monofy.band/public_html/pong3/
           dangerous-clean-slate: false
