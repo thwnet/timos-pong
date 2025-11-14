@@ -30,3 +30,11 @@ jobs:
           protocol:   "ftp"          # für FTPS/SFTP siehe Doku
           local-dir:  "./"           # oder z.B. "./dist" wenn du baust
           server-dir: ${{ secrets.FTP_DIR }}  # z.B. /public_html/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.github/**
+          timeout: 300000
+          dry-run: false
