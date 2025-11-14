@@ -20,6 +20,7 @@ const BALL_COLOR_DARK = "#000000";
 const PADDLE_COLOR_LIGHT = "#ffffff";
 const PADDLE_COLOR_DARK = "#333333";
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
+const OBJECT_COLOR_STORAGE_KEY = "pongObjectColor";
 
 const HITS_PER_LEVEL = 5; // Alle 5 Treffer -> nächstes Level
 const SPEED_INCREASE_PER_LEVEL = 0.5; // Neue Bälle werden pro Level schneller
@@ -34,6 +35,7 @@ let gameState = {
   backgroundColor: DEFAULT_BG_COLOR,
   ballColor: BALL_COLOR_DARK,
   paddleColor: PADDLE_COLOR_DARK,
+  customObjectColor: null,
 
   paddle: {
     x: 10,
@@ -63,13 +65,50 @@ function saveBackgroundColor(color) {
   localStorage.setItem(BG_STORAGE_KEY, color);
 }
 
+function loadObjectColor() {
+  const stored = localStorage.getItem(OBJECT_COLOR_STORAGE_KEY);
+  if (stored && isValidHexColor(stored)) {
+    return stored;
+  }
+  return null;
+}
+
+function saveObjectColor(color) {
+  if (isValidHexColor(color)) {
+    localStorage.setItem(OBJECT_COLOR_STORAGE_KEY, color);
+  } else {
+    localStorage.removeItem(OBJECT_COLOR_STORAGE_KEY);
+  }
+}
+
+function updateObjectColors() {
+  if (isValidHexColor(gameState.customObjectColor)) {
+    gameState.ballColor = gameState.customObjectColor;
+    gameState.paddleColor = gameState.customObjectColor;
+  } else {
+    const useLightColor = shouldUseLightBallColor(gameState.backgroundColor);
+    gameState.ballColor = useLightColor ? BALL_COLOR_LIGHT : BALL_COLOR_DARK;
+    gameState.paddleColor = useLightColor ? PADDLE_COLOR_LIGHT : PADDLE_COLOR_DARK;
+  }
+}
+
+function setCustomObjectColor(color) {
+  if (isValidHexColor(color)) {
+    gameState.customObjectColor = color;
+    saveObjectColor(color);
+  } else {
+    gameState.customObjectColor = null;
+    saveObjectColor(null);
+  }
+  updateObjectColors();
+  draw();
+}
+
 function applyBackgroundColor(color, { persist = true } = {}) {
   const finalColor = isValidHexColor(color) ? color : DEFAULT_BG_COLOR;
   gameState.backgroundColor = finalColor;
-  const useLightColor = shouldUseLightBallColor(finalColor);
-  gameState.ballColor = useLightColor ? BALL_COLOR_LIGHT : BALL_COLOR_DARK;
-  gameState.paddleColor = useLightColor ? PADDLE_COLOR_LIGHT : PADDLE_COLOR_DARK;
   document.documentElement.style.setProperty("--playground-bg", finalColor);
+  updateObjectColors();
   if (persist) {
     saveBackgroundColor(finalColor);
   }
@@ -105,6 +144,7 @@ function shouldUseLightBallColor(color) {
 }
 
 
+gameState.customObjectColor = loadObjectColor();
 applyBackgroundColor(loadBackgroundColor(), { persist: false });
 
 // Tastatur-Zustand
@@ -538,8 +578,25 @@ function setupBackgroundColorPicker(picker) {
   });
 }
 
+function setupObjectColorPicker(picker) {
+  if (!picker) return;
+  const initialColor =
+    gameState.customObjectColor && isValidHexColor(gameState.customObjectColor)
+      ? gameState.customObjectColor
+      : gameState.ballColor;
+  picker.value = initialColor;
+  picker.addEventListener("input", (e) => {
+    const color = e.target.value;
+    if (isValidHexColor(color)) {
+      setCustomObjectColor(color);
+    }
+  });
+}
+
 const bgColorPicker = document.getElementById("bgColorPicker");
 setupBackgroundColorPicker(bgColorPicker);
+const objectColorPicker = document.getElementById("objectColorPicker");
+setupObjectColorPicker(objectColorPicker);
 
 // ============================================
 // PFEIL-BUTTON-EVENTS (Touch-Steuerung)
