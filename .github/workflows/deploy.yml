@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Falls du einen Build hast, hier wieder aktivieren:
+      # Build-Schritte bei Bedarf hier wieder aktivieren:
       # - name: Install dependencies
       #   run: npm ci
       #
@@ -26,10 +26,10 @@ jobs:
           server:     ${{ secrets.FTP_SERVER }}
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
-          port:       ${{ secrets.FTP_PORT }}
-          protocol:   "ftps"   # entspricht deinem Client (kein TLS)
-          local-dir:  "./"    # oder z.B. "./dist/" falls du baust
-          server-dir: ${{ secrets.FTP_DIR }}   # z.B. /txwo.monofy.band/public_html/pong3/
+          port:       ${{ secrets.FTP_PORT }}   # 21
+          protocol:   "ftp"                     # WICHTIG: kein ftps
+          local-dir:  "./"                      # oder ./dist/, falls du baust
+          server-dir: ${{ secrets.FTP_DIR }}    # /txwo.monofy.band/public_html/pong3/
           dangerous-clean-slate: false
           exclude: |
             **/.git*
