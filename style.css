@@ -22,6 +22,34 @@ body {
   background: #fff;        /* Hintergrund: weiss */
 }
 
+.fail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 2000;
+}
+
+.fail-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.fail-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
 /* Auf Mobile: Body sollte alle Inhalte zeigen */
 @media (max-width: 480px) {
   html {

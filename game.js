@@ -5,6 +5,7 @@
 // Canvas holen
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const failOverlay = document.getElementById("failOverlay");
 
 // ============================================
 // SPIEL-EINSTELLUNGEN
@@ -117,6 +118,26 @@ function applyBackgroundColor(color, { persist = true } = {}) {
     saveBackgroundColor(finalColor);
   }
 }
+
+function showFailOverlay() {
+  if (failOverlay) {
+    failOverlay.classList.add("visible");
+  }
+}
+
+function hideFailOverlay() {
+  if (failOverlay) {
+    failOverlay.classList.remove("visible");
+  }
+}
+
+function clearFailOverlayTimeout() {
+  if (failOverlayTimeoutId) {
+    clearTimeout(failOverlayTimeoutId);
+    failOverlayTimeoutId = null;
+  }
+  hideFailOverlay();
+}
 function hexToRgb(hex) {
   if (!isValidHexColor(hex)) return null;
   let value = hex.replace("#", "");
@@ -161,6 +182,7 @@ let touchY = 0;
 // Arrow button states
 let arrowUpPressed = false;
 let arrowDownPressed = false;
+let failOverlayTimeoutId = null;
 
 // ============================================
 // TASTATUR-EVENTS
@@ -394,12 +416,26 @@ function updateBalls() {
     if (ball.x < 0) {
       // Score speichern bevor das Spiel zurückgesetzt wird
       saveScore(gameState.hits, gameState.level);
-      // Bei einem Fehler: komplettes Spiel zurücksetzen
-      resetGame();
+      // Overlay zeigen und Spiel nach Verzögerung zurücksetzen
+      handlePlayerFail();
       // Wichtig: Abbrechen, damit wir nicht weiter über alte Bälle iterieren
       return;
     }
   }
+}
+
+function handlePlayerFail() {
+  if (failOverlayTimeoutId) {
+    return;
+  }
+  gameState.paused = true;
+  showFailOverlay();
+  draw();
+  failOverlayTimeoutId = setTimeout(() => {
+    hideFailOverlay();
+    failOverlayTimeoutId = null;
+    resetGame();
+  }, 2000);
 }
 
 // ============================================
@@ -457,6 +493,7 @@ function updateResultsTable() {
 // SPIEL-RESET
 // ============================================
 function resetGame() {
+  clearFailOverlayTimeout();
   gameState.hits = 0;
   gameState.level = 1;
   gameState.paddle.y = canvas.height / 2 - PADDLE_HEIGHT / 2;
