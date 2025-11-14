@@ -7,6 +7,11 @@ const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const failOverlay = document.getElementById("failOverlay");
 const failOverlayImg = failOverlay ? failOverlay.querySelector("img") : null;
+const successOverlay = document.getElementById("successOverlay");
+const successOverlayImg = successOverlay ? successOverlay.querySelector("img") : null;
+const successOverlayText = successOverlay
+  ? successOverlay.querySelector(".overlay-text")
+  : null;
 
 // ============================================
 // SPIEL-EINSTELLUNGEN
@@ -29,6 +34,8 @@ const FAIL_GIF_URLS = [
   "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnptNGc4Z3hkaW41dGNmZWNxNzh1ZWtianNpaDZsN2hnenhtNnE4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/73E4wQO3OUZPO/giphy.gif",
   "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp2cDQ2ZmcyejExcmI5OWxwejZmMWJ0eXJxMzd2bGE1ZHF2NnczaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7ANdVTT5lH9Kw/giphy.gif",
 ];
+const SUCCESS_GIF_URL =
+  "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHc1MXIzYzVncXoxbTI3ZHlrejdhZGh5MXB0M285cWkyYnliNHRjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SJtptYpvo8PU1XQ7DX/giphy.gif";
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 const OBJECT_COLOR_STORAGE_KEY = "pongObjectColor";
 
@@ -46,6 +53,7 @@ let gameState = {
   ballColor: DEFAULT_OBJECT_COLOR,
   paddleColor: DEFAULT_OBJECT_COLOR,
   customObjectColor: DEFAULT_OBJECT_COLOR,
+  reachedLevel4: false,
 
   paddle: {
     x: 10,
@@ -158,6 +166,32 @@ function clearFailOverlayTimeout() {
   }
   hideFailOverlay();
 }
+
+function showSuccessOverlay(message = "yeah your so good!") {
+  if (successOverlayImg) {
+    successOverlayImg.src = SUCCESS_GIF_URL;
+  }
+  if (successOverlayText) {
+    successOverlayText.textContent = message;
+  }
+  if (successOverlay) {
+    successOverlay.classList.add("visible");
+  }
+}
+
+function hideSuccessOverlay() {
+  if (successOverlay) {
+    successOverlay.classList.remove("visible");
+  }
+}
+
+function clearSuccessOverlayTimeout() {
+  if (successOverlayTimeoutId) {
+    clearTimeout(successOverlayTimeoutId);
+    successOverlayTimeoutId = null;
+  }
+  hideSuccessOverlay();
+}
 function hexToRgb(hex) {
   if (!isValidHexColor(hex)) return null;
   let value = hex.replace("#", "");
@@ -203,6 +237,7 @@ let touchY = 0;
 let arrowUpPressed = false;
 let arrowDownPressed = false;
 let failOverlayTimeoutId = null;
+let successOverlayTimeoutId = null;
 
 // ============================================
 // TASTATUR-EVENTS
@@ -382,7 +417,22 @@ function levelUp(newLevel) {
     ball.dy *= 1.05;
   });
 
+  handleLevelSuccess(newLevel);
   updateHud();
+}
+
+function handleLevelSuccess(level) {
+  if (level >= 4 && !gameState.reachedLevel4) {
+    gameState.reachedLevel4 = true;
+    if (successOverlayTimeoutId) {
+      clearSuccessOverlayTimeout();
+    }
+    showSuccessOverlay("yeah your so good!");
+    successOverlayTimeoutId = setTimeout(() => {
+      hideSuccessOverlay();
+      successOverlayTimeoutId = null;
+    }, 1000);
+  }
 }
 
 // ============================================
@@ -514,9 +564,11 @@ function updateResultsTable() {
 // ============================================
 function resetGame() {
   clearFailOverlayTimeout();
+  clearSuccessOverlayTimeout();
   gameState.hits = 0;
   gameState.level = 1;
   gameState.paddle.y = canvas.height / 2 - PADDLE_HEIGHT / 2;
+  gameState.reachedLevel4 = false;
 
   initBalls(1); // wieder mit einem Ball starten
   updateHud();

@@ -22,7 +22,7 @@ body {
   background: #fff;        /* Hintergrund: weiss */
 }
 
-.fail-overlay {
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -34,20 +34,32 @@ body {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
   z-index: 2000;
 }
 
-.fail-overlay.visible {
+.overlay.visible {
   opacity: 1;
   visibility: visible;
 }
 
-.fail-overlay img {
+.overlay img {
   max-width: 90vw;
   max-height: 90vh;
   border-radius: 12px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.overlay .overlay-content {
+  text-align: center;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 1.5rem;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.overlay .overlay-text {
+  margin-top: 16px;
 }
 
 /* Auf Mobile: Body sollte alle Inhalte zeigen */
