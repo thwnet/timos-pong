@@ -21,6 +21,7 @@ const PADDLE_HEIGHT = 80;
 const DEFAULT_PADDLE_SPEED = 5;
 const MIN_PADDLE_SPEED = 2;
 const MAX_PADDLE_SPEED = 15;
+const TARGET_MAX_PADDLE_SPEED = MAX_PADDLE_SPEED * 2;
 const BALL_SIZE = 10;
 const BALL_SPEED = 4; // Basisgeschwindigkeit der Bälle
 const DEFAULT_BG_COLOR = "#001a4d";
@@ -50,7 +51,8 @@ const SPEED_INCREASE_PER_LEVEL = 0.5; // Neue Bälle werden pro Level schneller
 // ============================================
 // SPIELZUSTAND
 // ============================================
-let paddleSpeed = loadPaddleSpeed();
+let paddleSpeedSetting = loadPaddleSpeedSetting();
+let paddleSpeed = computeActualPaddleSpeed(paddleSpeedSetting);
 
 let gameState = {
   paused: true,
@@ -137,7 +139,20 @@ function setCustomObjectColor(color) {
   draw();
 }
 
-function loadPaddleSpeed() {
+function computeActualPaddleSpeed(value) {
+  const setting = clamp(value, MIN_PADDLE_SPEED, MAX_PADDLE_SPEED);
+  if (setting <= MIN_PADDLE_SPEED) {
+    return MIN_PADDLE_SPEED;
+  }
+  const ratio =
+    (setting - MIN_PADDLE_SPEED) / (MAX_PADDLE_SPEED - MIN_PADDLE_SPEED);
+  return (
+    MIN_PADDLE_SPEED +
+    ratio * (TARGET_MAX_PADDLE_SPEED - MIN_PADDLE_SPEED)
+  );
+}
+
+function loadPaddleSpeedSetting() {
   const stored = localStorage.getItem(PADDLE_SPEED_STORAGE_KEY);
   if (!stored) return DEFAULT_PADDLE_SPEED;
   const value = parseInt(stored, 10);
@@ -145,16 +160,21 @@ function loadPaddleSpeed() {
   return clamp(value, MIN_PADDLE_SPEED, MAX_PADDLE_SPEED);
 }
 
-function savePaddleSpeed(value) {
+function savePaddleSpeedSetting(value) {
   localStorage.setItem(PADDLE_SPEED_STORAGE_KEY, String(value));
 }
 
 function setPaddleSpeed(value, { persist = true } = {}) {
-  const numericValue = clamp(Number(value) || DEFAULT_PADDLE_SPEED, MIN_PADDLE_SPEED, MAX_PADDLE_SPEED);
-  paddleSpeed = numericValue;
+  const numericValue = clamp(
+    Number(value) || DEFAULT_PADDLE_SPEED,
+    MIN_PADDLE_SPEED,
+    MAX_PADDLE_SPEED
+  );
+  paddleSpeedSetting = numericValue;
+  paddleSpeed = computeActualPaddleSpeed(paddleSpeedSetting);
   updatePaddleSpeedUI();
   if (persist) {
-    savePaddleSpeed(numericValue);
+    savePaddleSpeedSetting(numericValue);
   }
 }
 
@@ -761,22 +781,22 @@ function setupObjectColorPicker(picker) {
 function setupPaddleSpeedControl(slider, valueDisplay) {
   updatePaddleSpeedUI();
   if (slider) {
-    slider.value = paddleSpeed;
+    slider.value = paddleSpeedSetting;
     slider.addEventListener("input", (e) => {
       setPaddleSpeed(e.target.value);
     });
   }
   if (valueDisplay) {
-    valueDisplay.textContent = paddleSpeed;
+    valueDisplay.textContent = paddleSpeedSetting;
   }
 }
 
 function updatePaddleSpeedUI() {
   if (paddleSpeedSlider) {
-    paddleSpeedSlider.value = paddleSpeed;
+    paddleSpeedSlider.value = paddleSpeedSetting;
   }
   if (paddleSpeedValueEl) {
-    paddleSpeedValueEl.textContent = paddleSpeed;
+    paddleSpeedValueEl.textContent = paddleSpeedSetting;
   }
 }
 
