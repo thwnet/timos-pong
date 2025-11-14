@@ -14,6 +14,8 @@ const PADDLE_HEIGHT = 80;
 const PADDLE_SPEED = 5;
 const BALL_SIZE = 10;
 const BALL_SPEED = 4; // Basisgeschwindigkeit der Bälle
+const DEFAULT_BG_COLOR = "#eeeeee";
+const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 
 const HITS_PER_LEVEL = 5; // Alle 5 Treffer -> nächstes Level
 const SPEED_INCREASE_PER_LEVEL = 0.5; // Neue Bälle werden pro Level schneller
@@ -25,6 +27,7 @@ let gameState = {
   paused: true,
   hits: 0,
   level: 1, // Start-Level
+  backgroundColor: DEFAULT_BG_COLOR,
 
   paddle: {
     x: 10,
@@ -34,6 +37,36 @@ let gameState = {
   // Jetzt mehrere Bälle statt nur einem
   balls: [], // Array von Ball-Objekten
 };
+
+// ============================================
+// HINTERGRUNDFARBE
+// ============================================
+function isValidHexColor(color) {
+  return typeof color === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color);
+}
+
+function loadBackgroundColor() {
+  const stored = localStorage.getItem(BG_STORAGE_KEY);
+  if (stored && isValidHexColor(stored)) {
+    return stored;
+  }
+  return DEFAULT_BG_COLOR;
+}
+
+function saveBackgroundColor(color) {
+  localStorage.setItem(BG_STORAGE_KEY, color);
+}
+
+function applyBackgroundColor(color, { persist = true } = {}) {
+  const finalColor = isValidHexColor(color) ? color : DEFAULT_BG_COLOR;
+  gameState.backgroundColor = finalColor;
+  document.documentElement.style.setProperty("--playground-bg", finalColor);
+  if (persist) {
+    saveBackgroundColor(finalColor);
+  }
+}
+
+applyBackgroundColor(loadBackgroundColor(), { persist: false });
 
 // Tastatur-Zustand
 const keys = {};
@@ -374,7 +407,7 @@ function updateHud() {
 // ============================================
 function draw() {
   // Hintergrund
-  ctx.fillStyle = "#eee";
+  ctx.fillStyle = gameState.backgroundColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Schläger
@@ -453,6 +486,21 @@ const pauseBtnDesktop = document.getElementById("pauseBtnDesktop");
 const resetBtnDesktop = document.getElementById("resetBtnDesktop");
 setupButton(pauseBtnDesktop, true);
 setupButton(resetBtnDesktop, false);
+
+// ============================================
+// HINTERGRUND-FARBAUSWAHL
+// ============================================
+function setupBackgroundColorPicker(picker) {
+  if (!picker) return;
+  picker.value = gameState.backgroundColor;
+  picker.addEventListener("input", (e) => {
+    applyBackgroundColor(e.target.value);
+    draw();
+  });
+}
+
+const bgColorPicker = document.getElementById("bgColorPicker");
+setupBackgroundColorPicker(bgColorPicker);
 
 // ============================================
 // PFEIL-BUTTON-EVENTS (Touch-Steuerung)
