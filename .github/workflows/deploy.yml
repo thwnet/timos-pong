@@ -13,20 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug DNS for FTP server
-        run: |
-          echo "FTP Deploy Test Username: ${{ secrets.FTP_USERNAME }}..."
-
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server:     "pongftp.waespis.net"
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
+          port:       21
+          protocol:   "ftps"                  # explicit TLS per Metanet guide
           local-dir:  "./"
-          server-dir: "./"        
+          server-dir: "./"
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
             **/.github/**
+          timeout: 120000
+          dry-run: false
           log-level: "verbose"
