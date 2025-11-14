@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+      - name: Debug raw FTP banner
+      run: |
+        echo "QUIT" | nc -v ${{ secrets.FTP_SERVER }} ${{ secrets.FTP_PORT }} || true
+    
+
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
