@@ -6,6 +6,7 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const failOverlay = document.getElementById("failOverlay");
+const failOverlayImg = failOverlay ? failOverlay.querySelector("img") : null;
 
 // ============================================
 // SPIEL-EINSTELLUNGEN
@@ -21,6 +22,13 @@ const BALL_COLOR_LIGHT = "#ffffff";
 const BALL_COLOR_DARK = "#000000";
 const PADDLE_COLOR_LIGHT = "#ffffff";
 const PADDLE_COLOR_DARK = "#333333";
+const FAIL_GIF_URLS = [
+  "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXhmbTJobmI0aWVoazR0M3h6enNrdmVhNHdqM2k1YTJoMTRneWZiMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mFdnWF1RTI7fi/giphy.gif",
+  "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGduM3NzZ3NiMXgyMnhiemV4ajB1ZjJtdWNhamN0MjI5ZnJtZ3dyeCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/LW6hZxaWkkWrK/giphy.gif",
+  "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbzU0N2d5ZmxzNHdmbWdqZ2g2aGxweW5zNGZnbGloMTZ6MmU3aDFmbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vOM8yfLQvZPe8/giphy.gif",
+  "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnptNGc4Z3hkaW41dGNmZWNxNzh1ZWtianNpaDZsN2hnenhtNnE4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/73E4wQO3OUZPO/giphy.gif",
+  "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp2cDQ2ZmcyejExcmI5OWxwejZmMWJ0eXJxMzd2bGE1ZHF2NnczaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7ANdVTT5lH9Kw/giphy.gif",
+];
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 const OBJECT_COLOR_STORAGE_KEY = "pongObjectColor";
 
@@ -119,7 +127,19 @@ function applyBackgroundColor(color, { persist = true } = {}) {
   }
 }
 
+function getRandomFailGif() {
+  if (!FAIL_GIF_URLS.length) return null;
+  const index = Math.floor(Math.random() * FAIL_GIF_URLS.length);
+  return FAIL_GIF_URLS[index];
+}
+
 function showFailOverlay() {
+  if (failOverlayImg) {
+    const randomGif = getRandomFailGif();
+    if (randomGif) {
+      failOverlayImg.src = randomGif;
+    }
+  }
   if (failOverlay) {
     failOverlay.classList.add("visible");
   }
