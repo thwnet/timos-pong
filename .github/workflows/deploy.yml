@@ -1,4 +1,3 @@
-
 name: Deploy to Hoststar
 
 on:
@@ -14,6 +13,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ----------------------------------------------------------
+      # Debug: raw FTP banner anzeigen (wichtig für Fehlersuche)
+      # ----------------------------------------------------------
+      - name: Debug raw FTP banner
+        run: |
+          echo "Testing raw FTP connection on ${{ secrets.FTP_SERVER }}:${{ secrets.FTP_PORT }} ..."
+          echo "QUIT" | nc -v ${{ secrets.FTP_SERVER }} ${{ secrets.FTP_PORT }} || true
+          echo "---- End of FTP banner test ----"
+
       # Falls du einen Build hast, hier wieder aktivieren:
       # - name: Install dependencies
       #   run: npm ci
@@ -21,6 +29,9 @@ jobs:
       # - name: Build
       #   run: npm run build
 
+      # ----------------------------------------------------------
+      # Deploy via FTP
+      # ----------------------------------------------------------
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
@@ -28,7 +39,7 @@ jobs:
           username:   ${{ secrets.FTP_USERNAME }}
           password:   ${{ secrets.FTP_PASSWORD }}
           port:       ${{ secrets.FTP_PORT }}
-          protocol:   "ftp"   # entspricht deinem Client (kein TLS)
+          protocol:   "ftp"   # wichtig: kein ftps, kein sftp
           local-dir:  "./"    # oder z.B. "./dist/" falls du baust
           server-dir: ${{ secrets.FTP_DIR }}   # z.B. /txwo.monofy.band/public_html/pong3/
           dangerous-clean-slate: false
