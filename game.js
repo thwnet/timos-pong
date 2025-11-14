@@ -15,6 +15,8 @@ const PADDLE_SPEED = 5;
 const BALL_SIZE = 10;
 const BALL_SPEED = 4; // Basisgeschwindigkeit der Bälle
 const DEFAULT_BG_COLOR = "#eeeeee";
+const BALL_COLOR_LIGHT = "#ffffff";
+const BALL_COLOR_DARK = "#000000";
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 
 const HITS_PER_LEVEL = 5; // Alle 5 Treffer -> nächstes Level
@@ -28,6 +30,7 @@ let gameState = {
   hits: 0,
   level: 1, // Start-Level
   backgroundColor: DEFAULT_BG_COLOR,
+  ballColor: BALL_COLOR_DARK,
 
   paddle: {
     x: 10,
@@ -60,11 +63,44 @@ function saveBackgroundColor(color) {
 function applyBackgroundColor(color, { persist = true } = {}) {
   const finalColor = isValidHexColor(color) ? color : DEFAULT_BG_COLOR;
   gameState.backgroundColor = finalColor;
+  gameState.ballColor = shouldUseLightBallColor(finalColor)
+    ? BALL_COLOR_LIGHT
+    : BALL_COLOR_DARK;
   document.documentElement.style.setProperty("--playground-bg", finalColor);
   if (persist) {
     saveBackgroundColor(finalColor);
   }
 }
+function hexToRgb(hex) {
+  if (!isValidHexColor(hex)) return null;
+  let value = hex.replace("#", "");
+  if (value.length === 3) {
+    value = value
+      .split("")
+      .map((char) => char + char)
+      .join("");
+  }
+  const int = parseInt(value, 16);
+  return {
+    r: (int >> 16) & 255,
+    g: (int >> 8) & 255,
+    b: int & 255,
+  };
+}
+
+function getRelativeBrightness(color) {
+  const rgb = hexToRgb(color);
+  if (!rgb) return null;
+  const { r, g, b } = rgb;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function shouldUseLightBallColor(color) {
+  const brightness = getRelativeBrightness(color);
+  if (brightness === null) return false;
+  return brightness < 0.4;
+}
+
 
 applyBackgroundColor(loadBackgroundColor(), { persist: false });
 
@@ -420,7 +456,7 @@ function draw() {
   );
 
   // Alle Bälle
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = gameState.ballColor || BALL_COLOR_DARK;
   for (const ball of gameState.balls) {
     ctx.fillRect(ball.x, ball.y, BALL_SIZE, BALL_SIZE);
   }
