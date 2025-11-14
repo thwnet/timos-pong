@@ -34,8 +34,10 @@ const FAIL_GIF_URLS = [
   "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnptNGc4Z3hkaW41dGNmZWNxNzh1ZWtianNpaDZsN2hnenhtNnE4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/73E4wQO3OUZPO/giphy.gif",
   "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp2cDQ2ZmcyejExcmI5OWxwejZmMWJ0eXJxMzd2bGE1ZHF2NnczaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7ANdVTT5lH9Kw/giphy.gif",
 ];
-const SUCCESS_GIF_URL =
+const SUCCESS_GIF_LEVEL4 =
   "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHc1MXIzYzVncXoxbTI3ZHlrejdhZGh5MXB0M285cWkyYnliNHRjMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SJtptYpvo8PU1XQ7DX/giphy.gif";
+const SUCCESS_GIF_LEVEL6 =
+  "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTN6ZXJpNHZ4enZiYWdpaWxpN28yaHBoM29wdHZ4YzNlYnkxaWY5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/G3uXJGdnIEQ9sFcxTR/giphy.gif";
 const BG_STORAGE_KEY = "pongPlaygroundBgColor";
 const OBJECT_COLOR_STORAGE_KEY = "pongObjectColor";
 
@@ -54,6 +56,7 @@ let gameState = {
   paddleColor: DEFAULT_OBJECT_COLOR,
   customObjectColor: DEFAULT_OBJECT_COLOR,
   reachedLevel4: false,
+  reachedLevel6: false,
 
   paddle: {
     x: 10,
@@ -167,9 +170,12 @@ function clearFailOverlayTimeout() {
   hideFailOverlay();
 }
 
-function showSuccessOverlay(message = "yeah your so good!") {
+function showSuccessOverlay(
+  message = "yeah your so good!",
+  gifUrl = SUCCESS_GIF_LEVEL4
+) {
   if (successOverlayImg) {
-    successOverlayImg.src = SUCCESS_GIF_URL;
+    successOverlayImg.src = gifUrl;
   }
   if (successOverlayText) {
     successOverlayText.textContent = message;
@@ -424,15 +430,30 @@ function levelUp(newLevel) {
 function handleLevelSuccess(level) {
   if (level >= 4 && !gameState.reachedLevel4) {
     gameState.reachedLevel4 = true;
-    if (successOverlayTimeoutId) {
-      clearSuccessOverlayTimeout();
-    }
-    showSuccessOverlay("yeah your so good!");
-    successOverlayTimeoutId = setTimeout(() => {
-      hideSuccessOverlay();
-      successOverlayTimeoutId = null;
-    }, 1000);
+    triggerSuccessOverlay({
+      message: "yeah your so good!",
+      gifUrl: SUCCESS_GIF_LEVEL4,
+    });
+  } else if (level >= 6 && !gameState.reachedLevel6) {
+    gameState.reachedLevel6 = true;
+    triggerSuccessOverlay({
+      message: "Level 6! Unstoppable!",
+      gifUrl: SUCCESS_GIF_LEVEL6,
+    });
   }
+}
+
+function triggerSuccessOverlay({
+  message = "Great job!",
+  gifUrl = SUCCESS_GIF_LEVEL4,
+  duration = 1000,
+} = {}) {
+  clearSuccessOverlayTimeout();
+  showSuccessOverlay(message, gifUrl);
+  successOverlayTimeoutId = setTimeout(() => {
+    hideSuccessOverlay();
+    successOverlayTimeoutId = null;
+  }, duration);
 }
 
 // ============================================
@@ -569,6 +590,7 @@ function resetGame() {
   gameState.level = 1;
   gameState.paddle.y = canvas.height / 2 - PADDLE_HEIGHT / 2;
   gameState.reachedLevel4 = false;
+  gameState.reachedLevel6 = false;
 
   initBalls(1); // wieder mit einem Ball starten
   updateHud();
