@@ -226,6 +226,7 @@ function showSuccessOverlay(
 ) {
   if (successOverlayImg) {
     successOverlayImg.src = gifUrl;
+    setSuccessOverlayImageSize();
   }
   if (successOverlayText) {
     successOverlayText.textContent = message;
@@ -233,6 +234,14 @@ function showSuccessOverlay(
   if (successOverlay) {
     successOverlay.classList.add("visible");
   }
+}
+
+function setSuccessOverlayImageSize() {
+  if (!successOverlayImg || !canvas) return;
+  const referenceWidth = canvas.clientWidth || canvas.width || 640;
+  const targetWidth = referenceWidth * 0.5; // quarter area => half width/height
+  successOverlayImg.style.width = `${targetWidth}px`;
+  successOverlayImg.style.height = "auto";
 }
 
 function hideSuccessOverlay() {
