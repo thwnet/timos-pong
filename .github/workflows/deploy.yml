@@ -54,4 +54,3 @@ jobs:
             --exclude-glob node_modules --exclude-glob node_modules/** \
             ./ "${REMOTE_DIR}"
           bye
-EOF
